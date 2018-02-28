@@ -3,11 +3,11 @@ import Message from "./Message";
 
 class Messages extends React.Component {
     render() {
-        const {messages} = this.props
+        const {messages, selectAll} = this.props
 
         return (
             <div>
-                {messages.map(message => <Message message={message}/>)}
+                {messages.map(message => <Message message={message} rowSelected={selectAll}/>)}
             </div>
         )
     }

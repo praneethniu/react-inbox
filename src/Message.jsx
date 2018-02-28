@@ -3,43 +3,58 @@ import React from 'react'
 class Message extends React.Component {
     constructor(props) {
         super(props);
-        const {message} = this.props
+        const {message, rowSelected} = this.props
 
         this.state = {
-            rowClass: message.read ? 'read' : 'unread',
-            starClass: 'fa-star-o'
+            rowStatus: message.read,
+            rowSelected,
+            starSelected: false
         };
+    }
 
+    componentWillReceiveProps(nextProps) {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                rowSelected: nextProps.rowSelected
+            }
+        });
     }
 
     handleCheckbox = (e) => {
-        console.log('row class', this.state.rowClass)
         if (e.target.value == 'on') {
-            this.setState((prevState) => ({
-                ...prevState,
-                rowClass: this.state.rowClass === 'unread'? 'read selected' : 'unread'
-            }));
+            this.setState((prevState) => {
+                return {
+                    ...prevState,
+                    rowSelected: !prevState.rowSelected
+                }
+            });
         }
     }
 
     handleStar = () => {
         this.setState((prevState) => ({
             ...prevState,
-            starClass: prevState.starClass === 'fa-star-o' ? 'fa-star' : 'fa-star-o'
+            starSelected: !prevState.starSelected
+
         }));
     }
 
     render() {
         const {message} = this.props
+        console.log('state ', this.state)
+        const starClass = this.state.starSelected ? 'fa-star' : 'fa-star-o'
+        let rowClass = (this.state.rowStatus ? 'read' : 'unread') + (this.state.rowSelected ? ' selected' : '')
+
         return (
-            <div className={`row message ${this.state.rowClass}`}>
+            <div className={`row message ${rowClass}`}>
                 <div className="col-xs-1">
                     <div className="row">
                         <div className="col-xs-2">
-                            <input type="checkbox" onClick={this.handleCheckbox}/>
+                            <input type="checkbox" checked={this.state.rowSelected} onClick={this.handleCheckbox}/>
                         </div>
                         <div className="col-xs-2">
-                            <i className={`star fa ${this.state.starClass}`} onClick={this.handleStar}></i>
+                            <i className={`star fa ${starClass}`} onClick={this.handleStar}></i>
 
                         </div>
                     </div>
