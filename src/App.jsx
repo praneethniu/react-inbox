@@ -26,6 +26,7 @@ class App extends Component {
                     selectAll={this.state.selectAll}
                     handleMarkAsRead={this.handleMarkAsRead}
                     handleMarkAsUnRead={this.handleMarkAsUnRead}
+                    unreadCount={this.unreadCount()}
                 />
                 <Messages
                     messages={this.state.messages}
@@ -146,6 +147,10 @@ class App extends Component {
                 messages: newMessages
             }
         })
+    }
+
+    unreadCount = () => {
+        return this.state.messages.filter(message => message.read === false).length
     }
 }
 
