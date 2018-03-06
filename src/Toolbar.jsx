@@ -2,7 +2,7 @@ import React from 'react'
 
 class Toolbar extends React.Component {
     render() {
-        const {handleSelectAll, selectAll, handleMarkAsRead, handleMarkAsUnRead, unreadCount} = this.props
+        const {handleSelectAll, selectAll, handleMarkAsRead, handleMarkAsUnRead, unreadCount, handleDeleteMessages} = this.props
         return (
             <div className="row toolbar">
                 <div className="col-md-12">
@@ -37,7 +37,7 @@ class Toolbar extends React.Component {
                         <option value="gschool">gschool</option>
                     </select>
 
-                    <button className="btn btn-default">
+                    <button className="btn btn-default" onClick={handleDeleteMessages}>
                         <i className="fa fa-trash-o"></i>
                     </button>
                 </div>

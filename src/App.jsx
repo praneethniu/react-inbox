@@ -26,6 +26,7 @@ class App extends Component {
                     selectAll={this.state.selectAll}
                     handleMarkAsRead={this.handleMarkAsRead}
                     handleMarkAsUnRead={this.handleMarkAsUnRead}
+                    handleDeleteMessages={this.handleDeleteMessages}
                     unreadCount={this.unreadCount()}
                 />
                 <Messages
@@ -151,6 +152,21 @@ class App extends Component {
 
     unreadCount = () => {
         return this.state.messages.filter(message => message.read === false).length
+    }
+
+
+    handleDeleteMessages = () => {
+        this.setState((prevState) => {
+            const newMessages = prevState.messages.map(message => {
+                if (!message.selected) {
+                    return message
+                } 
+            })
+            return {
+                ...prevState,
+                messages: newMessages.filter(message => message !== undefined)
+            }
+        })
     }
 }
 
