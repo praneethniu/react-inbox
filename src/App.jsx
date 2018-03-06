@@ -27,6 +27,8 @@ class App extends Component {
                     handleMarkAsRead={this.handleMarkAsRead}
                     handleMarkAsUnRead={this.handleMarkAsUnRead}
                     handleDeleteMessages={this.handleDeleteMessages}
+                    handleAddLabel={this.handleAddLabel}
+                    handleRemoveLabel={this.handleRemoveLabel}
                     unreadCount={this.unreadCount()}
                 />
                 <Messages
@@ -160,11 +162,47 @@ class App extends Component {
             const newMessages = prevState.messages.map(message => {
                 if (!message.selected) {
                     return message
-                } 
+                }
             })
             return {
                 ...prevState,
                 messages: newMessages.filter(message => message !== undefined)
+            }
+        })
+    }
+
+    handleAddLabel = (e) => {
+        const selectedValue = e.target.value
+        this.setState((prevState) => {
+            const newMessages = prevState.messages.map(message => {
+                if (message.selected && !message.labels.includes(selectedValue) && selectedValue !== 'Apply label') {
+                    message.labels.push(selectedValue)
+                }
+                return message
+            })
+            return {
+                ...prevState,
+                messages: newMessages
+            }
+        })
+    }
+
+    handleRemoveLabel = (e) => {
+        const selectedValue = e.target.value
+        this.setState((prevState) => {
+            const newMessages = prevState.messages.map(message => {
+                if (message.selected) {
+                    const labels  = message.labels.filter(label => label !== selectedValue)
+                    return {
+                        ...message,
+                        labels
+                    }
+                }
+                return message
+            })
+            return {
+                ...prevState,
+                messages: newMessages
             }
         })
     }

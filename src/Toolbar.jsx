@@ -2,7 +2,16 @@ import React from 'react'
 
 class Toolbar extends React.Component {
     render() {
-        const {handleSelectAll, selectAll, handleMarkAsRead, handleMarkAsUnRead, unreadCount, handleDeleteMessages} = this.props
+        const {
+            handleSelectAll,
+            selectAll,
+            handleMarkAsRead,
+            handleMarkAsUnRead,
+            unreadCount,
+            handleDeleteMessages,
+            handleAddLabel,
+            handleRemoveLabel
+        } = this.props
         return (
             <div className="row toolbar">
                 <div className="col-md-12">
@@ -23,14 +32,14 @@ class Toolbar extends React.Component {
                         Mark As Unread
                     </button>
 
-                    <select className="form-control label-select">
+                    <select className="form-control label-select" onChange={handleAddLabel}>
                         <option>Apply label</option>
                         <option value="dev">dev</option>
                         <option value="personal">personal</option>
                         <option value="gschool">gschool</option>
                     </select>
 
-                    <select className="form-control label-select">
+                    <select className="form-control label-select" onChange={handleRemoveLabel}>
                         <option>Remove label</option>
                         <option value="dev">dev</option>
                         <option value="personal">personal</option>
