@@ -25,6 +25,7 @@ class App extends Component {
                     handleSelectAll={this.handleSelectAll}
                     selectAll={this.state.selectAll}
                     handleMarkAsRead={this.handleMarkAsRead}
+                    handleMarkAsUnRead={this.handleMarkAsUnRead}
                 />
                 <Messages
                     messages={this.state.messages}
@@ -77,7 +78,7 @@ class App extends Component {
         })
     }
 
-    handleSelectAll = (e) => {
+    handleSelectAll = () => {
         this.setState((prevState) => {
             const selectAll = !prevState.selectAll
             if (selectAll) {
@@ -108,11 +109,43 @@ class App extends Component {
     }
 
     handleMarkAsRead = () => {
-        console.log('handle mark read', this.state.markRead)
-        this.setState((prevState) => ({
-            ...prevState,
-            markRead: !prevState.markRead
-        }))
+        this.setState((prevState) => {
+            const newMessages = prevState.messages.map(message => {
+                if (message.selected) {
+                    return {
+                        ...message,
+                        read: true,
+                        selected: false
+                    }
+                } else {
+                    return message
+                }
+            })
+            return {
+                ...prevState,
+                messages: newMessages
+            }
+        })
+    }
+
+    handleMarkAsUnRead = () => {
+        this.setState((prevState) => {
+            const newMessages = prevState.messages.map(message => {
+                if (message.selected) {
+                    return {
+                        ...message,
+                        read: false,
+                        selected: false
+                    }
+                } else {
+                    return message
+                }
+            })
+            return {
+                ...prevState,
+                messages: newMessages
+            }
+        })
     }
 }
 
