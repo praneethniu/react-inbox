@@ -2,7 +2,7 @@ import React from 'react'
 
 class Toolbar extends React.Component {
     render() {
-        const {handleSelectAll, selectAll} = this.props
+        const {handleSelectAll, selectAll, handleMarkAsRead} = this.props
         return (
             <div className="row toolbar">
                 <div className="col-md-12">
@@ -11,11 +11,11 @@ class Toolbar extends React.Component {
                         unread messages
                     </p>
 
-                    <button className="btn btn-default" onClick={handleSelectAll.bind(this)}>
+                    <button className="btn btn-default" onClick={handleSelectAll}>
                         <i className={`fa ${selectAll ? 'fa-check-square-o' : 'fa-minus-square-o'}`}></i>
                     </button>
 
-                    <button className="btn btn-default">
+                    <button className="btn btn-default" onClick={handleMarkAsRead}>
                         Mark As Read
                     </button>
 
