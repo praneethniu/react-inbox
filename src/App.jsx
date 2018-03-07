@@ -8,22 +8,20 @@ import Messages from "./Messages";
 class App extends Component {
     constructor(props) {
         super(props)
-        const data = require("./data.json");
 
         this.state = {
-            messages: data,
-            selectAll: false
+            messages: require("./data.json")
         }
-        this.handleCheckbox = this.handleCheckbox.bind(this)
     }
 
     render() {
-        console.log('state ', this.state.messages)
+        const selection = this.fetchSelectAll()
         return (
             <div className="App">
                 <Toolbar
+                    readOnly={this.readOnly()}
                     handleSelectAll={this.handleSelectAll}
-                    selectAll={this.state.selectAll}
+                    selectAll={selection}
                     handleMarkAsRead={this.handleMarkAsRead}
                     handleMarkAsUnRead={this.handleMarkAsUnRead}
                     handleDeleteMessages={this.handleDeleteMessages}
@@ -38,6 +36,26 @@ class App extends Component {
                 />
             </div>
         );
+    }
+
+    readOnly = () => {
+        return this.state.messages
+            .filter(message => message.selected).length === 0
+    }
+
+    fetchSelectAll = () => {
+        const selectedMessages = this.state.messages
+            .filter(message => message.selected)
+
+        if (selectedMessages.length === 0) {
+            return 'none'
+        }
+        else if (selectedMessages.length === this.state.messages.length) {
+            return 'all'
+        }
+        else {
+            return 'some'
+        }
     }
 
     handleCheckbox = (e) => {
@@ -83,12 +101,11 @@ class App extends Component {
     }
 
     handleSelectAll = () => {
+        const selectAll = this.fetchSelectAll()
         this.setState((prevState) => {
-            const selectAll = !prevState.selectAll
-            if (selectAll) {
+            if (selectAll !== 'all') {
                 return {
                     ...prevState,
-                    selectAll: selectAll,
                     messages: prevState.messages.map(message => {
                         return {
                             ...message,
@@ -99,7 +116,6 @@ class App extends Component {
             } else {
                 return {
                     ...prevState,
-                    selectAll: selectAll,
                     messages: prevState.messages.map(message => {
                         return {
                             ...message,
@@ -192,7 +208,7 @@ class App extends Component {
         this.setState((prevState) => {
             const newMessages = prevState.messages.map(message => {
                 if (message.selected) {
-                    const labels  = message.labels.filter(label => label !== selectedValue)
+                    const labels = message.labels.filter(label => label !== selectedValue)
                     return {
                         ...message,
                         labels
