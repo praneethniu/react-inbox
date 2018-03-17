@@ -10,8 +10,15 @@ class App extends Component {
         super(props)
 
         this.state = {
-            messages: require("./data.json")
+            messages: []
         }
+    }
+
+    async componentWillMount() {
+        const env = process.env
+        const response = await fetch(`${env.REACT_APP_API_URL}/api/messages`)
+        const json = await response.json()
+        this.setState({messages: json._embedded.messages})
     }
 
     render() {
@@ -79,25 +86,45 @@ class App extends Component {
         })
     }
 
-    handleStar = (e) => {
+    handleStar = async (e) => {
+        const env = process.env
+
         const id = e.target.id
+        let currentMessage
+        const newMessages = this.state.messages.map(message => {
+            if (message.id === Number(id)) {
+                currentMessage = {
+                    ...message,
+                    starred: !message.starred
+                }
+                return currentMessage
+            }
+            else {
+                return message
+            }
+        })
+
         this.setState((prevState) => {
-            const newMessages = prevState.messages.map(message => {
-                if (message.id === Number(id)) {
-                    return {
-                        ...message,
-                        starred: !message.starred
-                    }
-                }
-                else {
-                    return message
-                }
-            })
             return {
                 ...prevState,
                 messages: newMessages
             }
         })
+
+        const body  = {
+            "messageIds": [ currentMessage.id ],
+            "command": "star",
+            "star": currentMessage.starred
+        }
+
+         await fetch(`${env.REACT_APP_API_URL}/api/messages`, {
+            method: 'PATCH',
+            body: JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            }
+        });
     }
 
     handleSelectAll = () => {
