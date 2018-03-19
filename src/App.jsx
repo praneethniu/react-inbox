@@ -179,6 +179,11 @@ class App extends Component {
 
 
     handleMarkAsUnRead = () => {
+        this.patchMessages( {
+            "messageIds": this.fetchSelectedMessageIds(),
+            "command": "read",
+            "read": false
+        })
         this.setState((prevState) => {
             const newMessages = prevState.messages.map(message => {
                 if (message.selected) {
@@ -204,6 +209,11 @@ class App extends Component {
 
 
     handleDeleteMessages = () => {
+        this.patchMessages({
+            "messageIds": this.fetchSelectedMessageIds(),
+            "command": "delete" 
+        })
+
         this.setState((prevState) => {
             const newMessages = prevState.messages.map(message => {
                 if (!message.selected) {
@@ -219,6 +229,13 @@ class App extends Component {
 
     handleAddLabel = (e) => {
         const selectedValue = e.target.value
+
+        this.patchMessages({
+            "messageIds": this.fetchSelectedMessageIds(),
+            "command": "addLabel",
+            "label": selectedValue
+        })
+
         this.setState((prevState) => {
             const newMessages = prevState.messages.map(message => {
                 if (message.selected && !message.labels.includes(selectedValue) && selectedValue !== 'Apply label') {
@@ -235,6 +252,11 @@ class App extends Component {
 
     handleRemoveLabel = (e) => {
         const selectedValue = e.target.value
+        this.patchMessages({
+            "messageIds": this.fetchSelectedMessageIds(),
+            "command": "removeLabel",
+            "label": selectedValue
+        })
         this.setState((prevState) => {
             const newMessages = prevState.messages.map(message => {
                 if (message.selected) {
