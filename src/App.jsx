@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import Toolbar from "./Toolbar";
 import Messages from "./Messages";
+import {ComposeForm} from "./ComposeForm";
 
 
 class App extends Component {
@@ -10,7 +11,8 @@ class App extends Component {
         super(props)
 
         this.state = {
-            messages: []
+            messages: [],
+            openComposeForm: false
         }
     }
 
@@ -24,7 +26,7 @@ class App extends Component {
     render() {
         const selection = this.fetchSelectAll()
         return (
-            <div className="App">
+            <div className="container">
                 <Toolbar
                     readOnly={this.readOnly()}
                     handleSelectAll={this.handleSelectAll}
@@ -35,6 +37,13 @@ class App extends Component {
                     handleAddLabel={this.handleAddLabel}
                     handleRemoveLabel={this.handleRemoveLabel}
                     unreadCount={this.unreadCount()}
+                    renderForm={this.renderForm}
+
+                />
+                <ComposeForm
+                    openComposeForm={this.state.openComposeForm}
+                    postMessage={this.postMessage}
+                    renderForm={this.renderForm}
                 />
                 <Messages
                     messages={this.state.messages}
@@ -43,6 +52,15 @@ class App extends Component {
                 />
             </div>
         );
+    }
+
+    renderForm = () => {
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                openComposeForm: !prevState.openComposeForm
+            }
+        })
     }
 
     readOnly = () => {
@@ -104,14 +122,7 @@ class App extends Component {
             }
         })
 
-        this.setState((prevState) => {
-            return {
-                ...prevState,
-                messages: newMessages
-            }
-        })
-
-        this.patchMessages( {
+        this.patchMessages({
             "messageIds": [currentMessage.id],
             "command": "star",
             "star": currentMessage.starred
@@ -152,7 +163,7 @@ class App extends Component {
     }
 
     handleMarkAsRead = async () => {
-       this.patchMessages( {
+        this.patchMessages({
             "messageIds": this.fetchSelectedMessageIds(),
             "command": "read",
             "read": true
@@ -179,7 +190,7 @@ class App extends Component {
 
 
     handleMarkAsUnRead = () => {
-        this.patchMessages( {
+        this.patchMessages({
             "messageIds": this.fetchSelectedMessageIds(),
             "command": "read",
             "read": false
@@ -207,24 +218,12 @@ class App extends Component {
         return this.state.messages.filter(message => message.read === false).length
     }
 
-
     handleDeleteMessages = () => {
         this.patchMessages({
             "messageIds": this.fetchSelectedMessageIds(),
-            "command": "delete" 
+            "command": "delete"
         })
 
-        this.setState((prevState) => {
-            const newMessages = prevState.messages.map(message => {
-                if (!message.selected) {
-                    return message
-                }
-            })
-            return {
-                ...prevState,
-                messages: newMessages.filter(message => message !== undefined)
-            }
-        })
     }
 
     handleAddLabel = (e) => {
@@ -235,19 +234,6 @@ class App extends Component {
             "command": "addLabel",
             "label": selectedValue
         })
-
-        this.setState((prevState) => {
-            const newMessages = prevState.messages.map(message => {
-                if (message.selected && !message.labels.includes(selectedValue) && selectedValue !== 'Apply label') {
-                    message.labels.push(selectedValue)
-                }
-                return message
-            })
-            return {
-                ...prevState,
-                messages: newMessages
-            }
-        })
     }
 
     handleRemoveLabel = (e) => {
@@ -256,22 +242,6 @@ class App extends Component {
             "messageIds": this.fetchSelectedMessageIds(),
             "command": "removeLabel",
             "label": selectedValue
-        })
-        this.setState((prevState) => {
-            const newMessages = prevState.messages.map(message => {
-                if (message.selected) {
-                    const labels = message.labels.filter(label => label !== selectedValue)
-                    return {
-                        ...message,
-                        labels
-                    }
-                }
-                return message
-            })
-            return {
-                ...prevState,
-                messages: newMessages
-            }
         })
     }
 
@@ -286,6 +256,31 @@ class App extends Component {
                 'Accept': 'application/json',
             }
         });
+
+        const response = await fetch(`${env.REACT_APP_API_URL}/api/messages`)
+        const json = await response.json()
+        this.setState({messages: json._embedded.messages})
+    }
+
+
+    postMessage = async (subject, body) => {
+        const env = process.env
+
+        await fetch(`${env.REACT_APP_API_URL}/api/messages`, {
+            method: 'POST',
+            body: JSON.stringify({
+                subject,
+                body
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            }
+        });
+
+        const response = await fetch(`${env.REACT_APP_API_URL}/api/messages`)
+        const json = await response.json()
+        this.setState({messages: json._embedded.messages})
     }
 }
 

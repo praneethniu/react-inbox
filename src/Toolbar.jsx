@@ -11,7 +11,8 @@ class Toolbar extends React.Component {
             handleDeleteMessages,
             handleAddLabel,
             handleRemoveLabel,
-            readOnly
+            readOnly,
+            renderForm
         } = this.props
         return (
             <div className="row toolbar">
@@ -20,6 +21,11 @@ class Toolbar extends React.Component {
                         <span className="badge badge">{unreadCount}</span>
                         unread messages
                     </p>
+
+                    <a className="btn btn-danger" onClick={renderForm}>
+                        <i className="fa fa-plus" ></i>
+                    </a>
+
 
                     <button className="btn btn-default" onClick={handleSelectAll} disabled={readOnly}>
                         <i className={`fa ${selectAll === 'all' ? 'fa-check-square-o' :
