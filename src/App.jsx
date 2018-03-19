@@ -111,21 +111,13 @@ class App extends Component {
             }
         })
 
-        const body  = {
-            "messageIds": [ currentMessage.id ],
+        this.patchMessages( {
+            "messageIds": [currentMessage.id],
             "command": "star",
             "star": currentMessage.starred
-        }
-
-         await fetch(`${env.REACT_APP_API_URL}/api/messages`, {
-            method: 'PATCH',
-            body: JSON.stringify(body),
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            }
-        });
+        })
     }
+
 
     handleSelectAll = () => {
         const selectAll = this.fetchSelectAll()
@@ -155,7 +147,17 @@ class App extends Component {
         })
     }
 
-    handleMarkAsRead = () => {
+    fetchSelectedMessageIds = () => {
+        return this.state.messages.filter(message => message.selected).map(message => message.id)
+    }
+
+    handleMarkAsRead = async () => {
+       this.patchMessages( {
+            "messageIds": this.fetchSelectedMessageIds(),
+            "command": "read",
+            "read": true
+        })
+
         this.setState((prevState) => {
             const newMessages = prevState.messages.map(message => {
                 if (message.selected) {
@@ -174,6 +176,7 @@ class App extends Component {
             }
         })
     }
+
 
     handleMarkAsUnRead = () => {
         this.setState((prevState) => {
@@ -248,6 +251,19 @@ class App extends Component {
                 messages: newMessages
             }
         })
+    }
+
+    patchMessages = async (payload) => {
+        const env = process.env
+
+        await fetch(`${env.REACT_APP_API_URL}/api/messages`, {
+            method: 'PATCH',
+            body: JSON.stringify(payload),
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            }
+        });
     }
 }
 
