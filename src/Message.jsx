@@ -4,7 +4,7 @@ class Message extends React.Component {
     render() {
         const {message} = this.props
 
-        const rowClass = message.selected ? 'read selected': (message.read ? 'read': 'unread')
+        const rowClass = (message.read ? 'read' : 'unread') + (message.selected ? ' selected' : '')
         const starClass = message.starred ? 'fa-star' : 'fa-star-o'
 
         return (

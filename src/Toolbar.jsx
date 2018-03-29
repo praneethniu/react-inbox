@@ -27,7 +27,7 @@ class Toolbar extends React.Component {
                     </a>
 
 
-                    <button className="btn btn-default" onClick={handleSelectAll} disabled={readOnly}>
+                    <button className="btn btn-default" onClick={handleSelectAll}>
                         <i className={`fa ${selectAll === 'all' ? 'fa-check-square-o' :
                             (selectAll === 'some' ? 'fa-minus-square-o' : 'fa-square-o')}`}></i>
                     </button>
