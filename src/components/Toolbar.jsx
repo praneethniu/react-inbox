@@ -19,7 +19,7 @@ class Toolbar extends React.Component {
                 <div className="col-md-12">
                     <p className="pull-right">
                         <span className="badge badge">{unreadCount}</span>
-                        unread messages
+                        {unreadCount === 1 ? 'unread message' : 'unread messages'}
                     </p>
 
                     <a className="btn btn-danger" onClick={renderForm}>

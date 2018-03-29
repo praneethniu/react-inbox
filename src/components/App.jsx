@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import logo from './logo.svg';
-import './App.css';
+import logo from '../logo.svg';
+import '../App.css';
 import Toolbar from "./Toolbar";
 import Messages from "./Messages";
 import {ComposeForm} from "./ComposeForm";
@@ -16,7 +16,7 @@ class App extends Component {
         }
     }
 
-    async componentWillMount() {
+    async componentDidMount() {
         const env = process.env
         const response = await fetch(`${env.REACT_APP_API_URL}/api/messages`)
         const json = await response.json()
