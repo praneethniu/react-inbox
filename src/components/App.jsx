@@ -13,16 +13,7 @@ import {
 
 
 class App extends Component {
-    constructor(props) {
-        super(props)
-
-        this.state = {
-            messages: [],
-            openComposeForm: false
-        }
-    }
-
-    async componentDidMount() {
+    componentDidMount() {
       const {fetchMessages} = this.props
         fetchMessages()
     }
@@ -53,7 +44,7 @@ class App extends Component {
                 />
                 <Messages
                     messages={messages}
-                    handleCheckbox={this.handleCheckbox}
+                    handleCheckbox={this.props.toggleCheckbox.bind(this)}
                     handleStar={this.handleStar}
                 />
             </div>
@@ -84,12 +75,8 @@ class App extends Component {
         return this.props.messages.find(message => message.id === Number(id))
     }
 
-    handleCheckbox = (e) => {
-        this.props.toggleCheckbox(e.target.id)
-    }
-
     handleStar = (e) => {
-       this.props.toggleStar(this.fetchMessage( e.target.id))
+       this.props.toggleStar(this.fetchMessage(e.target.id))
     }
 
     handleSelectAll = () => {

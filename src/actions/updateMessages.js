@@ -20,9 +20,9 @@ export const toggleStar = (currentMessage) => {
     }
 }
 
-export const toggleCheckbox = (id) => {
+export const toggleCheckbox = (e) => {
     return (dispatch) => {
-        dispatch({type: TOGGLE_SELECT, id: id})
+        dispatch({type: TOGGLE_SELECT, id: e.target.id})
     }
 }
 
