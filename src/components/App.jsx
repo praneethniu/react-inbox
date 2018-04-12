@@ -8,7 +8,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {
     toggleStar, fetchMessages, toggleCheckbox, selectAll, markRead, markUnRead,
-    deleteMessages
+    deleteMessages, addLabel, removeLabel, postMessage, openCompassForm, renderForm
 } from "../actions/updateMessages";
 
 
@@ -43,12 +43,12 @@ class App extends Component {
                     handleAddLabel={this.handleAddLabel}
                     handleRemoveLabel={this.handleRemoveLabel}
                     unreadCount={this.unreadCount()}
-                    renderForm={this.renderForm}
+                    renderForm={this.props.renderForm}
 
                 />
                 <ComposeForm
-                    openComposeForm={this.state.openComposeForm}
-                    postMessage={this.postMessage}
+                    openComposeForm={this.props.openComposeForm}
+                    postMessage={this.props.postMessage}
                     renderForm={this.renderForm}
                 />
                 <Messages
@@ -58,15 +58,6 @@ class App extends Component {
                 />
             </div>
         );
-    }
-
-    renderForm = () => {
-        this.setState((prevState) => {
-            return {
-                ...prevState,
-                openComposeForm: !prevState.openComposeForm
-            }
-        })
     }
 
     readOnly = () => {
@@ -95,7 +86,6 @@ class App extends Component {
 
     handleCheckbox = (e) => {
         this.props.toggleCheckbox(e.target.id)
-
     }
 
     handleStar = (e) => {
@@ -128,98 +118,17 @@ class App extends Component {
     }
 
     handleAddLabel = (e) => {
-        const selectedValue = e.target.value
-
-        this.patchMessages({
-            "messageIds": this.fetchSelectedMessageIds(),
-            "command": "addLabel",
-            "label": selectedValue
-        })
-
-        this.setState((prevState) => {
-            const newMessages = prevState.messages.map(message => {
-                if (message.selected && !message.labels.includes(selectedValue) && selectedValue !== 'Apply label') {
-                    message.labels.push(selectedValue)
-                }
-                return message
-            })
-            return {
-                ...prevState,
-                messages: newMessages
-            }
-        })
+        this.props.addLabel(this.fetchSelectedMessageIds(), e.target.value)
     }
 
     handleRemoveLabel = (e) => {
-        const selectedValue = e.target.value
-        this.patchMessages({
-            "messageIds": this.fetchSelectedMessageIds(),
-            "command": "removeLabel",
-            "label": selectedValue
-        })
-        this.setState((prevState) => {
-            const newMessages = prevState.messages.map(message => {
-                if (message.selected) {
-                    const labels = message.labels.filter(label => label !== selectedValue)
-                    return {
-                        ...message,
-                        labels
-                    }
-                }
-                return message
-            })
-            return {
-                ...prevState,
-                messages: newMessages
-            }
-        })
-    }
-
-    patchMessages = async (payload) => {
-        const env = process.env
-
-        await fetch(`${env.REACT_APP_API_URL}/api/messages`, {
-            method: 'PATCH',
-            body: JSON.stringify(payload),
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            }
-        });
-    }
-
-    postMessage = async (subject, value) => {
-        const env = process.env
-
-        const response = await fetch(`${env.REACT_APP_API_URL}/api/messages`, {
-            method: 'POST',
-            body: JSON.stringify({
-                subject,
-                value
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            }
-        });
-
-        const json = await response.json()
-        this.setState((prevState) => {
-            const newMessages = [
-                ...prevState.messages,
-                json
-            ]
-
-            return {
-                ...prevState,
-                messages: newMessages
-            }
-        })
+        this.props.removeLabel(this.fetchSelectedMessageIds(), e.target.value)
     }
 }
 
 const mapStateToProps = state => ({
     messages: state.messages,
+    openComposeForm: state.openComposeForm
 })
 
 const mapDispatchToProps = dispatch => bindActionCreators({
@@ -229,6 +138,10 @@ const mapDispatchToProps = dispatch => bindActionCreators({
     markRead,
     markUnRead,
     deleteMessages,
+    addLabel,
+    removeLabel,
+    postMessage,
+    renderForm,
     fetchMessages
 }, dispatch)
 
