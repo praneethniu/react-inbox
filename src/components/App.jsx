@@ -6,7 +6,7 @@ import Messages from "./Messages";
 import {ComposeForm} from "./ComposeForm";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {toggleStar, fetchMessages} from "../actions/updateMessages";
+import {toggleStar, fetchMessages, toggleCheckbox, selectAll, markRead, markUnRead} from "../actions/updateMessages";
 
 
 class App extends Component {
@@ -67,18 +67,18 @@ class App extends Component {
     }
 
     readOnly = () => {
-        return this.state.messages
+        return this.props.messages
             .filter(message => message.selected).length === 0
     }
 
     fetchSelectAll = () => {
-        const selectedMessages = this.state.messages
+        const selectedMessages = this.props.messages
             .filter(message => message.selected)
 
         if (selectedMessages.length === 0) {
             return 'none'
         }
-        else if (selectedMessages.length === this.state.messages.length) {
+        else if (selectedMessages.length === this.props.messages.length) {
             return 'all'
         }
         else {
@@ -91,24 +91,8 @@ class App extends Component {
     }
 
     handleCheckbox = (e) => {
-        const id = e.target.id
-        this.setState((prevState) => {
-            const newMessages = prevState.messages.map(message => {
-                if (message.id === Number(id)) {
-                    return {
-                        ...message,
-                        selected: !message.selected
-                    }
-                }
-                else {
-                    return message
-                }
-            })
-            return {
-                ...prevState,
-                messages: newMessages
-            }
-        })
+        this.props.toggleCheckbox(e.target.id)
+
     }
 
     handleStar = (e) => {
@@ -116,65 +100,21 @@ class App extends Component {
     }
 
     handleSelectAll = () => {
-        const selectAll = this.fetchSelectAll()
-        this.setState((prevState) => {
-            if (selectAll !== 'all') {
-                return {
-                    ...prevState,
-                    messages: prevState.messages.map(message => {
-                        return {
-                            ...message,
-                            selected: true
-                        }
-                    })
-                }
-            } else {
-                return {
-                    ...prevState,
-                    messages: prevState.messages.map(message => {
-                        return {
-                            ...message,
-                            selected: false
-                        }
-                    })
-
-                }
-            }
-        })
+        this.props.selectAll(this.fetchSelectAll())
     }
 
     fetchSelectedMessageIds = () => {
-        return this.state.messages.filter(message => message.selected).map(message => message.id)
+        return this.props.messages.filter(message => message.selected).map(message => message.id)
     }
 
     handleMarkAsRead = async () => {
-        this.patchMessages({
-            "messageIds": this.fetchSelectedMessageIds(),
-            "command": "read",
-            "read": true
-        })
-
-        this.setState((prevState) => {
-            const newMessages = prevState.messages.map(message => {
-                if (message.selected) {
-                    return {
-                        ...message,
-                        read: true,
-                        selected: false
-                    }
-                } else {
-                    return message
-                }
-            })
-            return {
-                ...prevState,
-                messages: newMessages
-            }
-        })
+        this.props.markRead(this.fetchSelectedMessageIds())
     }
 
 
     handleMarkAsUnRead = () => {
+        this.props.markUnRead(this.fetchSelectedMessageIds())
+
         this.patchMessages({
             "messageIds": this.fetchSelectedMessageIds(),
             "command": "read",
@@ -200,9 +140,8 @@ class App extends Component {
     }
 
     unreadCount = () => {
-        return this.state.messages.filter(message => message.read === false).length
+        return this.props.messages.filter(message => message.read === false).length
     }
-
 
     handleDeleteMessages = () => {
         this.patchMessages({
@@ -320,6 +259,10 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => bindActionCreators({
     toggleStar,
+    toggleCheckbox,
+    selectAll,
+    markRead,
+    markUnRead,
     fetchMessages
 }, dispatch)
 
