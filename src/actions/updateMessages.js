@@ -1,7 +1,7 @@
 import {
     MARK_READ, MARK_UNREAD, RECEIVE_MESSAGES, RECEIVE_STAR_MESSAGE, REQUEST_MARK_READ, REQUEST_STAR_MESSAGE,
     RECEIVE_MARK_READ, SELECT_ALL,
-    TOGGLE_SELECT, REQUEST_MARK_UNREAD, RECEIVE_MARK_UNREAD
+    TOGGLE_SELECT, REQUEST_MARK_UNREAD, RECEIVE_MARK_UNREAD, REQUEST_DELETE_MESSAGE, RECEIVE_DELETE_MESSAGE
 } from "../actionTypes";
 
 
@@ -54,6 +54,17 @@ export const markUnRead = (ids) => {
     }
 }
 
+export const deleteMessages = (ids) => {
+    return (dispatch) => {
+        dispatch({type: REQUEST_DELETE_MESSAGE})
+        patchMessages({
+            "messageIds": ids,
+            "command": "delete"
+        })
+        dispatch({type: RECEIVE_DELETE_MESSAGE})
+    }
+}
+
 const patchMessages = async (payload) => {
     const env = process.env
 
@@ -84,5 +95,6 @@ export default {
     selectAll,
     markRead,
     markUnRead,
+    deleteMessages,
     fetchMessages
 }

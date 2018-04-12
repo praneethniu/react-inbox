@@ -1,6 +1,6 @@
 import {
     RECEIVE_MESSAGES, RECEIVE_STAR_MESSAGE, RECEIVE_MARK_READ, SELECT_ALL, TOGGLE_SELECT,
-    RECEIVE_MARK_UNREAD
+    RECEIVE_MARK_UNREAD, RECEIVE_DELETE_MESSAGE
 } from "../actionTypes";
 
 const initialState = {
@@ -104,6 +104,18 @@ export default (state = initialState, action) => {
                 ...state,
                 messages: newMessages
             }
+
+        case RECEIVE_DELETE_MESSAGE:
+            newMessages = state.messages.map(message => {
+                if (!message.selected) {
+                    return message
+                }
+            })
+            return {
+                ...state,
+                messages: newMessages.filter(message => message !== undefined)
+            }
+
         default:
             return state
     }

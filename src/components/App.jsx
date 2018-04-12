@@ -6,7 +6,10 @@ import Messages from "./Messages";
 import {ComposeForm} from "./ComposeForm";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {toggleStar, fetchMessages, toggleCheckbox, selectAll, markRead, markUnRead} from "../actions/updateMessages";
+import {
+    toggleStar, fetchMessages, toggleCheckbox, selectAll, markRead, markUnRead,
+    deleteMessages
+} from "../actions/updateMessages";
 
 
 class App extends Component {
@@ -114,29 +117,6 @@ class App extends Component {
 
     handleMarkAsUnRead = () => {
         this.props.markUnRead(this.fetchSelectedMessageIds())
-
-        this.patchMessages({
-            "messageIds": this.fetchSelectedMessageIds(),
-            "command": "read",
-            "read": false
-        })
-        this.setState((prevState) => {
-            const newMessages = prevState.messages.map(message => {
-                if (message.selected) {
-                    return {
-                        ...message,
-                        read: false,
-                        selected: false
-                    }
-                } else {
-                    return message
-                }
-            })
-            return {
-                ...prevState,
-                messages: newMessages
-            }
-        })
     }
 
     unreadCount = () => {
@@ -144,22 +124,7 @@ class App extends Component {
     }
 
     handleDeleteMessages = () => {
-        this.patchMessages({
-            "messageIds": this.fetchSelectedMessageIds(),
-            "command": "delete"
-        })
-
-        this.setState((prevState) => {
-            const newMessages = prevState.messages.map(message => {
-                if (!message.selected) {
-                    return message
-                }
-            })
-            return {
-                ...prevState,
-                messages: newMessages.filter(message => message !== undefined)
-            }
-        })
+        this.props.deleteMessages(this.fetchSelectedMessageIds())
     }
 
     handleAddLabel = (e) => {
@@ -263,6 +228,7 @@ const mapDispatchToProps = dispatch => bindActionCreators({
     selectAll,
     markRead,
     markUnRead,
+    deleteMessages,
     fetchMessages
 }, dispatch)
 
