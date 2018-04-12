@@ -4,6 +4,9 @@ import '../App.css';
 import Toolbar from "./Toolbar";
 import Messages from "./Messages";
 import {ComposeForm} from "./ComposeForm";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {toggleStar, fetchMessages} from "../actions/updateMessages";
 
 
 class App extends Component {
@@ -17,14 +20,14 @@ class App extends Component {
     }
 
     async componentDidMount() {
-        const env = process.env
-        const response = await fetch(`${env.REACT_APP_API_URL}/api/messages`)
-        const json = await response.json()
-        this.setState({messages: json._embedded.messages})
+      const {fetchMessages} = this.props
+        fetchMessages()
     }
 
     render() {
         const selection = this.fetchSelectAll()
+        console.log('props', this.props)
+        const {messages} = this.props
         return (
             <div className="container">
                 <Toolbar
@@ -46,7 +49,7 @@ class App extends Component {
                     renderForm={this.renderForm}
                 />
                 <Messages
-                    messages={this.state.messages}
+                    messages={messages}
                     handleCheckbox={this.handleCheckbox}
                     handleStar={this.handleStar}
                 />
@@ -83,6 +86,10 @@ class App extends Component {
         }
     }
 
+    fetchMessage = (id) => {
+        return this.props.messages.find(message => message.id === Number(id))
+    }
+
     handleCheckbox = (e) => {
         const id = e.target.id
         this.setState((prevState) => {
@@ -104,38 +111,9 @@ class App extends Component {
         })
     }
 
-    handleStar = async (e) => {
-        const env = process.env
-
-        const id = e.target.id
-        let currentMessage
-        const newMessages = this.state.messages.map(message => {
-            if (message.id === Number(id)) {
-                currentMessage = {
-                    ...message,
-                    starred: !message.starred
-                }
-                return currentMessage
-            }
-            else {
-                return message
-            }
-        })
-
-        this.setState((prevState) => {
-            return {
-                ...prevState,
-                messages: newMessages
-            }
-        })
-
-        this.patchMessages({
-            "messageIds": [currentMessage.id],
-            "command": "star",
-            "star": currentMessage.starred
-        })
+    handleStar = (e) => {
+       this.props.toggleStar(this.fetchMessage( e.target.id))
     }
-
 
     handleSelectAll = () => {
         const selectAll = this.fetchSelectAll()
@@ -306,7 +284,6 @@ class App extends Component {
         });
     }
 
-
     postMessage = async (subject, value) => {
         const env = process.env
 
@@ -337,4 +314,16 @@ class App extends Component {
     }
 }
 
-export default App;
+const mapStateToProps = state => ({
+    messages: state.messages,
+})
+
+const mapDispatchToProps = dispatch => bindActionCreators({
+    toggleStar,
+    fetchMessages
+}, dispatch)
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(App)

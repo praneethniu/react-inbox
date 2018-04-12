@@ -27,7 +27,7 @@ export class ComposeForm extends React.Component {
                         </div>
                     </div>
                     <div className="form-group">
-                        <label for="body" className="col-sm-2 control-label">Body</label>
+                        <label className="col-sm-2 control-label">Body</label>
                         <div className="col-sm-8">
                             <textarea name="body" id="body" className="form-control"></textarea>
                         </div>
