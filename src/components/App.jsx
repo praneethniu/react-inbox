@@ -122,6 +122,13 @@ class App extends Component {
             }
         })
 
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                messages: newMessages
+            }
+        })
+
         this.patchMessages({
             "messageIds": [currentMessage.id],
             "command": "star",
@@ -218,12 +225,24 @@ class App extends Component {
         return this.state.messages.filter(message => message.read === false).length
     }
 
+
     handleDeleteMessages = () => {
         this.patchMessages({
             "messageIds": this.fetchSelectedMessageIds(),
             "command": "delete"
         })
 
+        this.setState((prevState) => {
+            const newMessages = prevState.messages.map(message => {
+                if (!message.selected) {
+                    return message
+                }
+            })
+            return {
+                ...prevState,
+                messages: newMessages.filter(message => message !== undefined)
+            }
+        })
     }
 
     handleAddLabel = (e) => {
@@ -234,6 +253,19 @@ class App extends Component {
             "command": "addLabel",
             "label": selectedValue
         })
+
+        this.setState((prevState) => {
+            const newMessages = prevState.messages.map(message => {
+                if (message.selected && !message.labels.includes(selectedValue) && selectedValue !== 'Apply label') {
+                    message.labels.push(selectedValue)
+                }
+                return message
+            })
+            return {
+                ...prevState,
+                messages: newMessages
+            }
+        })
     }
 
     handleRemoveLabel = (e) => {
@@ -242,6 +274,22 @@ class App extends Component {
             "messageIds": this.fetchSelectedMessageIds(),
             "command": "removeLabel",
             "label": selectedValue
+        })
+        this.setState((prevState) => {
+            const newMessages = prevState.messages.map(message => {
+                if (message.selected) {
+                    const labels = message.labels.filter(label => label !== selectedValue)
+                    return {
+                        ...message,
+                        labels
+                    }
+                }
+                return message
+            })
+            return {
+                ...prevState,
+                messages: newMessages
+            }
         })
     }
 
@@ -256,21 +304,17 @@ class App extends Component {
                 'Accept': 'application/json',
             }
         });
-
-        const response = await fetch(`${env.REACT_APP_API_URL}/api/messages`)
-        const json = await response.json()
-        this.setState({messages: json._embedded.messages})
     }
 
 
-    postMessage = async (subject, body) => {
+    postMessage = async (subject, value) => {
         const env = process.env
 
-        await fetch(`${env.REACT_APP_API_URL}/api/messages`, {
+        const response = await fetch(`${env.REACT_APP_API_URL}/api/messages`, {
             method: 'POST',
             body: JSON.stringify({
                 subject,
-                body
+                value
             }),
             headers: {
                 'Content-Type': 'application/json',
@@ -278,9 +322,18 @@ class App extends Component {
             }
         });
 
-        const response = await fetch(`${env.REACT_APP_API_URL}/api/messages`)
         const json = await response.json()
-        this.setState({messages: json._embedded.messages})
+        this.setState((prevState) => {
+            const newMessages = [
+                ...prevState.messages,
+                json
+            ]
+
+            return {
+                ...prevState,
+                messages: newMessages
+            }
+        })
     }
 }
 
